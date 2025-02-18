@@ -1,121 +1,189 @@
-import { MantineThemeOverride } from '@mantine/core';
+import { MantineThemeOverride } from "@mantine/core";
 
 export const theme: MantineThemeOverride = {
-	colorScheme: "light",
-	primaryColor: "primary",
-	primaryShade: 6,
-	fontFamily: 'Outfit,sans-serif',
-	fontFamilyMonospace: 'Monaco, Courier, monospace',
-	fontSizes: { // 16px
-		xs: '1rem', // 12px
-		sm: '1rem', // 14px
-		md: '1.25rem', // 16px
-		lg: '1.5rem', // 18px
-		xl: '1.8rem' // 20px
-	},
-	breakpoints: {
-		xs: '30em',
-		sm: '48em',
-		md: '64em',
-		lg: '74em',
-		xl: '90em',
-	},
-	// radius: {
-	// 	xs: '0.25rem',
-	// 	sm: '0.375rem',
-	// 	md: '0.5rem',
-	// 	lg: '0.75rem',
-	// 	xl: '1rem'
-	// },
-	spacing: {
-		xs: '0.25rem',
-		sm: '0.5rem',
-		md: '0.75rem',
-		lg: '1rem',
-		xl: '1.25rem'
-	},
-	shadows: {
-		xs: '0.25rem',
-		sm: '0.5rem',
-		md: '0.75rem',
-		lg: '1rem',
-		xl: '1.25rem'
-	},
-	headings: {
-		fontFamily: 'Outfit,sans-serif;',
-		sizes: {
-			h1: {
-				fontSize: '2.1rem',
-				fontWeight: '700',
-			},
-			h2: {
-				fontSize: '1.9rem',
-				fontWeight: '2.5rem'
-			},
-			h3: {
-				fontSize: '1.75rem',
-				fontWeight: '2.5rem'
-			},
-			h4: {
-				fontSize: '1.5rem',
-				fontWeight: '500'
-			},
-			h5: {
-				fontSize: '1.2rem',
-				fontWeight: '500'
-			}
-		}
-	},
-	components: {
-		TextInput: {
-			styles: {
-				label: {
-					fontSize: '1rem',
-					color: '#DCE7FCFF',
-				},
-				input: {
-					borderRadius: '2rem !important',
-					backgroundColor: '#DCE7FCFF',
-				}
-			}
-		},
-		Select: {
-			styles: {
-				label: {
-					fontSize: '1rem',
-					color: '#DCE7FCFF',
-				},
-				input: {
-					borderRadius: '2rem !important',
-					backgroundColor: '#DCE7FCFF',
-				}
-			}
-		},
-		BackgroundImage: {
-			styles: {
-				root: {
-					img: {
-						filter: "blur(12px)"
-					}
-				}
-			}
-		},
-		header: {
-			styles: {
-				root: {
-					backgroundColor: '#FFFFFF',
-				}
-			}
-		}
-	},
-	colors: {
-		primary: ['#CCE0FF', '#BAD0F3', '#9BACD9', '#5E77BC', '#4963AE', '#2F4070', '#232F53', '#1B2541', '#001A41'],
-		secondary: ['#DCDDEC', '#D2D4E7', '#C6C8E1', '#ACAFD3', '#7F83B8', '#646AAD', '#4C518F', '#393D6B', '#0C1f56', '#06102B'],
-		success: ['#ECFDF5', '#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B'],
-		warning: ['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F'],
-		error: ['#FEF2F2', '#FEE2E2', '#FECACA', '#FCA5A5', '#F87171', '#EF4444', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D'],
-		neutral: ['#FBFBFC', '#EEEFF2', '#DADBE2', '#CBD5E1', '#8D90A7', '#6F728F', '#454966', '#383A4B', '#313038', '#21222C'],
-		shades: ['#FFFFFF', '#000000']
+  colorScheme: "dark",
+  fontFamily:
+    "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+  primaryColor: "spaceNeutral",
+  defaultRadius: "md",
 
-	}
-}
+  // Monochrome color palette
+  colors: {
+    spaceNeutral: [
+      "#FFFFFF", // Pure white
+      "#F5F5F5",
+      "#E5E5E5",
+      "#D4D4D4",
+      "#A3A3A3",
+      "#737373",
+      "#525252",
+      "#22272B", // SpaceX Dark Gray
+      "#181C1F", // SpaceX Darker Gray
+      "#0F1112", // SpaceX Darkest
+    ],
+  },
+
+  components: {
+    Button: {
+      styles: (theme) => ({
+        root: {
+          backgroundColor: "#FFFFFF",
+          color: "#0F1112",
+          border: "none",
+          height: "42px",
+          padding: "0 24px",
+          fontSize: theme.fontSizes.sm,
+          fontWeight: 500,
+          transition: "all 0.2s ease",
+          "&:hover": {
+            backgroundColor: "#E5E5E5",
+            transform: "translateY(-1px)",
+          },
+          "&:active": {
+            transform: "translateY(0)",
+          },
+          "&[data-loading]": {
+            backgroundColor: "#D4D4D4",
+          },
+          '&[data-variant="outline"]': {
+            backgroundColor: "transparent",
+            border: "1px solid #FFFFFF",
+            color: "#FFFFFF",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+            },
+          },
+        },
+      }),
+    },
+
+    Card: {
+      styles: () => ({
+        root: {
+          backgroundColor: "#181C1F",
+          backdropFilter: "blur(8px)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow: "0 12px 24px rgba(0, 0, 0, 0.2)",
+          },
+        },
+      }),
+    },
+
+    Paper: {
+      styles: () => ({
+        root: {
+          backgroundColor: "#0F1112",
+          backdropFilter: "blur(8px)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+        },
+      }),
+    },
+
+    Badge: {
+      styles: () => ({
+        root: {
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          fontWeight: 600,
+          padding: "0 10px",
+          height: "22px",
+          fontSize: "11px",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          color: "#FFFFFF",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+
+          '&[data-variant="filled"]': {
+            backgroundColor: "#FFFFFF",
+            color: "#0F1112",
+            borderColor: "transparent",
+          },
+
+          '&[data-variant="outline"]': {
+            backgroundColor: "transparent",
+            borderColor: "#FFFFFF",
+            color: "#FFFFFF",
+          },
+        },
+      }),
+    },
+
+    TextInput: {
+      styles: () => ({
+        input: {
+          height: "42px",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          color: "#FFFFFF",
+          "&:focus": {
+            borderColor: "#FFFFFF",
+            backgroundColor: "rgba(255, 255, 255, 0.08)",
+          },
+          "&::placeholder": {
+            color: "#737373",
+          },
+        },
+        label: {
+          marginBottom: "6px",
+          fontSize: "0.875rem",
+          fontWeight: 500,
+          color: "#D4D4D4",
+        },
+      }),
+    },
+
+    Select: {
+      styles: () => ({
+        input: {
+          height: "42px",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          color: "#FFFFFF",
+          "&:focus": {
+            borderColor: "#FFFFFF",
+            backgroundColor: "rgba(255, 255, 255, 0.08)",
+          },
+        },
+        label: {
+          marginBottom: "6px",
+          fontSize: "0.875rem",
+          fontWeight: 500,
+          color: "#D4D4D4",
+        },
+      }),
+    },
+  },
+
+  other: {
+    headerHeight: "70px",
+    sideNavWidth: "280px",
+    maxContentWidth: "1440px",
+    borderRadius: {
+      sm: "4px",
+      md: "6px",
+      lg: "8px",
+      xl: "12px",
+    },
+    boxShadow: {
+      sm: "0 2px 4px rgba(0,0,0,0.08)",
+      md: "0 4px 8px rgba(0,0,0,0.12)",
+      lg: "0 8px 16px rgba(0,0,0,0.16)",
+      xl: "0 12px 24px rgba(0,0,0,0.2)",
+    },
+    transition: {
+      fast: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+      medium: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+      slow: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+    },
+    zIndex: {
+      dropdown: 1000,
+      sticky: 1020,
+      fixed: 1030,
+      modal: 1040,
+      popover: 1050,
+      tooltip: 1060,
+    },
+  },
+};

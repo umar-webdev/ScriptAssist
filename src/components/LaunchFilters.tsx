@@ -1,59 +1,118 @@
-import { Group, Switch, Select, Button } from '@mantine/core';
+import { Group, Select, Button, Stack, Paper, Popover } from '@mantine/core';
+import { Filter, FilterX } from 'lucide-react';
 import { useAppStore } from '../store/app.store';
+import { useState } from 'react';
 
-const YEARS = Array.from({ length: 11 }, (_, i) => ({
-  value: String(2024 - i),
-  label: String(2024 - i)
-}));
+const years = Array.from({ length: 11 }, (_, i) => (2013 + i).toString());
 
 export function LaunchFilters() {
-  const { selectedLaunchFilters, setLaunchFilters, selectedYear, setSelectedYear } = useAppStore();
+  const [opened, setOpened] = useState(false);
+  const { 
+    selectedYear, 
+    setSelectedYear,
+    selectedLaunchFilters,
+    setSelectedLaunchFilters
+  } = useAppStore();
 
   const resetFilters = () => {
-    setLaunchFilters({
+    setSelectedYear('');
+    setSelectedLaunchFilters({
       success: null,
       withCrew: null
     });
-    setSelectedYear(null);
   };
 
+  const hasActiveFilters = selectedYear || 
+    selectedLaunchFilters.success !== null || 
+    selectedLaunchFilters.withCrew !== null;
+
   return (
-    <Group position="apart" mb="xl">
-      <Group>
-        <Select
-          label="Launch Year"
-          placeholder="Select year"
-          clearable
-          value={selectedYear}
-          onChange={setSelectedYear}
-          data={YEARS}
-          style={{ width: 200 }}
-        />
-        
-        <Switch
-          label="Successful Launches Only"
-          checked={selectedLaunchFilters.success === true}
-          onChange={(event) => setLaunchFilters({ 
-            success: event.currentTarget.checked ? true : null 
+    <Popover 
+      opened={opened} 
+      onChange={setOpened} 
+      position="bottom-end" 
+      shadow="md" 
+      width={260}
+    >
+      <Popover.Target>
+        <Button 
+          variant={hasActiveFilters ? "filled" : "light"}
+          leftIcon={hasActiveFilters ? <Filter size={16} /> : <FilterX size={16} />}
+          color={hasActiveFilters ? "primary" : "gray"}
+          onClick={() => setOpened((o) => !o)}
+          sx={(theme) => ({
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              transform: 'translateY(-1px)',
+            }
           })}
-        />
+        >
+          Filters {hasActiveFilters && '(Active)'}
+        </Button>
+      </Popover.Target>
 
-        <Switch
-          label="Crewed Missions Only"
-          checked={selectedLaunchFilters.withCrew === true}
-          onChange={(event) => setLaunchFilters({ 
-            withCrew: event.currentTarget.checked ? true : null 
-          })}
-        />
-      </Group>
+      <Popover.Dropdown>
+        <Stack spacing="md">
+          <Select
+            label="Launch Year"
+            placeholder="All years"
+            value={selectedYear}
+            onChange={setSelectedYear}
+            data={[
+              { value: '', label: 'All years' },
+              ...years.map(year => ({ value: year, label: year }))
+            ]}
+            searchable
+            clearable
+          />
 
-      <Button 
-        variant="subtle" 
-        onClick={resetFilters}
-        disabled={!selectedYear && !selectedLaunchFilters.success && !selectedLaunchFilters.withCrew}
-      >
-        Reset Filters
-      </Button>
-    </Group>
+          <Select
+            label="Mission Status"
+            placeholder="All statuses"
+            value={selectedLaunchFilters.success === null ? '' : 
+                   selectedLaunchFilters.success ? 'success' : 'failed'}
+            onChange={(value) => setSelectedLaunchFilters({
+              ...selectedLaunchFilters,
+              success: value === '' ? null : value === 'success'
+            })}
+            data={[
+              { value: '', label: 'All statuses' },
+              { value: 'success', label: 'Successful' },
+              { value: 'failed', label: 'Failed' }
+            ]}
+          />
+
+          <Select
+            label="Crew Filter"
+            placeholder="All missions"
+            value={selectedLaunchFilters.withCrew === null ? '' :
+                   selectedLaunchFilters.withCrew ? 'crew' : 'no-crew'}
+            onChange={(value) => setSelectedLaunchFilters({
+              ...selectedLaunchFilters,
+              withCrew: value === '' ? null : value === 'crew'
+            })}
+            data={[
+              { value: '', label: 'All missions' },
+              { value: 'crew', label: 'Crewed missions' },
+              { value: 'no-crew', label: 'Uncrewed missions' }
+            ]}
+          />
+
+          <Button 
+            variant="light"
+            color="gray"
+            leftIcon={<FilterX size={16} />}
+            onClick={() => {
+              resetFilters();
+              setOpened(false);
+            }}
+            disabled={!hasActiveFilters}
+            fullWidth
+          >
+            Reset Filters
+          </Button>
+        </Stack>
+      </Popover.Dropdown>
+    </Popover>
   );
 }

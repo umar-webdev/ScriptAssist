@@ -1,20 +1,185 @@
-* {
-	margin: 0;
-	padding: 0;
-	body {
-		h1 {
-			font-size: clamp(2.5rem, 4vw, 4rem);
-			font-weight: 500;
-		}
-		h2 {
-			font-size: clamp(1.5rem, 2.5vw, 4rem);
-		}
-		h3 {
-			font-size: clamp(1.2rem, 1.8vw, 3rem);
-		}
-		p {
-			font-size: clamp(1.1rem, 1.2vw, 2rem);
-		}
-	}
+// styles/global.scss
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+// Advanced animation keyframes
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Custom utility classes
+.glass-panel {
+  background: rgba(13, 15, 22, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--mantine-radius-md);
+}
+
+.glass-panel-hover {
+  @extend .glass-panel;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #00A6FF 0%, #FF0071 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+.fade-slide-up {
+  animation: fadeSlideUp 0.5s ease-out forwards;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+// Advanced table styles
+.table-container {
+  .mantine-Table-root {
+    border-spacing: 0;
+    border-collapse: separate;
+    
+    th {
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.875rem;
+      padding: 1rem;
+      
+      &:first-child {
+        border-top-left-radius: var(--mantine-radius-md);
+      }
+      
+      &:last-child {
+        border-top-right-radius: var(--mantine-radius-md);
+      }
+    }
+    
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+    }
+    
+    tr {
+      &:hover td {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      
+      &:last-child td {
+        border-bottom: none;
+        
+        &:first-child {
+          border-bottom-left-radius: var(--mantine-radius-md);
+        }
+        
+        &:last-child {
+          border-bottom-right-radius: var(--mantine-radius-md);
+        }
+      }
+    }
+  }
+}
+
+// Responsive helpers
+.hide-on-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.show-on-mobile {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+// Background grid pattern
+.bg-grid {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+// Custom layout utilities
+.content-width {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
