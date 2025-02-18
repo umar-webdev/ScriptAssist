@@ -46,7 +46,7 @@ const LoginModal = ({ opened, onClose }) => {
     if (user) {
       localStorage.setItem("currentUser", JSON.stringify(user));
       onClose();
-      navigate("/launchList");
+      navigate("/dashboard");
     } else {
       setError("Invalid credentials");
     }
@@ -263,7 +263,7 @@ const RegisterModal = ({ opened, onClose }) => {
     localStorage.setItem("users", JSON.stringify(users));
     localStorage.setItem("currentUser", JSON.stringify(newUser));
     onClose();
-    navigate("/launchList");
+    navigate("/dashboard");
   };
 
   return (

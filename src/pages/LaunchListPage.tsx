@@ -412,14 +412,14 @@ export default function LaunchListPage() {
   });
 
   const isLoading = launchesLoading || rocketsLoading;
+  const hasActiveFilters = selectedYear || selectedStatus || selectedCrew;
+
+  // Process data
   const rocketNames = rockets?.reduce((acc, rocket) => {
     acc[rocket.id] = rocket.name;
     return acc;
   }, {});
 
-  // Filter and sort launches
-  const hasActiveFilters = selectedYear || selectedStatus || selectedCrew;
-  
   const filteredLaunches = launches?.filter(launch => {
     const matchesSearch = search === '' || 
       launch.name.toLowerCase().includes(search.toLowerCase());
@@ -454,7 +454,11 @@ export default function LaunchListPage() {
     <Box 
       sx={{ 
         backgroundColor: SPACEX_COLORS.background,
-        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        maxHeight: '100vh',
+        overflow: 'hidden',
       }}
     >
       {/* Header Section */}
@@ -593,70 +597,72 @@ export default function LaunchListPage() {
         </Container>
       </Box>
 
-      {/* Content Section */}
-      <Container size="xl" px={isMobile ? "md" : "xl"}>
-        <Box 
-          sx={{ 
-            position: 'relative', 
-            minHeight: 200,
-            marginBottom: isMobile ? 80 : 40  // Account for mobile nav
-          }}
-        >
-          <LoadingOverlay 
-            visible={isLoading} 
-            overlayBlur={2}
-            loaderProps={{ 
-              variant: 'dots',
-              size: 'xl',
-              color: SPACEX_COLORS.primary 
+      {/* Main Content */}
+      <ScrollArea 
+        sx={{ 
+          flex: 1,
+          height: `calc(100vh - ${isMobile ? '280px' : '240px'})`,
+        }}
+        onScrollPositionChange={({ y }) => setScrolled(y > 0)}
+      >
+        <Container size="xl" px={isMobile ? "md" : "xl"}>
+          <Box 
+            sx={{ 
+              position: 'relative',
+              minHeight: 200,
+              paddingBottom: isMobile ? 80 : 40,
             }}
-          />
-          
-          {isMobile ? (
-            // Mobile Card View
-            <Stack spacing="md">
-              {isLoading ? (
-                [...Array(3)].map((_, i) => (
-                  <Skeleton key={i} height={160} radius="md" />
-                ))
-              ) : sortedLaunches?.length === 0 ? (
-                <Paper
-                  p="xl"
-                  radius="md"
-                  sx={{
-                    backgroundColor: SPACEX_COLORS.surface,
-                    border: `1px solid ${SPACEX_COLORS.border}`,
-                    textAlign: 'center',
-                  }}
-                >
-                  <Text color="dimmed">
-                    No launches found matching your filters
-                  </Text>
-                </Paper>
-              ) : (
-                sortedLaunches?.map(launch => (
-                  <LaunchCard
-                    key={launch.id}
-                    launch={launch}
-                    rocketName={rocketNames?.[launch.rocket]}
-                    onClick={() => navigate(`/launches/${launch.id}`)}
-                  />
-                ))
-              )}
-            </Stack>
-          ) : (
-            // Desktop Table View
-            <Paper
-              radius="md"
-              sx={{
-                backgroundColor: SPACEX_COLORS.surface,
-                border: `1px solid ${SPACEX_COLORS.border}`,
-                overflow: 'hidden',
+          >
+            <LoadingOverlay 
+              visible={isLoading} 
+              overlayBlur={2}
+              loaderProps={{ 
+                variant: 'dots',
+                size: 'xl',
+                color: SPACEX_COLORS.primary 
               }}
-            >
-              <ScrollArea 
-                onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-                sx={{ maxHeight: 'calc(100vh - 300px)' }}
+            />
+            
+            {isMobile ? (
+              // Mobile Card View
+              <Stack spacing="md">
+                {isLoading ? (
+                  [...Array(3)].map((_, i) => (
+                    <Skeleton key={i} height={160} radius="md" />
+                  ))
+                ) : sortedLaunches?.length === 0 ? (
+                  <Paper
+                    p="xl"
+                    radius="md"
+                    sx={{
+                      backgroundColor: SPACEX_COLORS.surface,
+                      border: `1px solid ${SPACEX_COLORS.border}`,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Text color="dimmed">
+                      No launches found matching your filters
+                    </Text>
+                  </Paper>
+                ) : (
+                  sortedLaunches?.map(launch => (
+                    <LaunchCard
+                      key={launch.id}
+                      launch={launch}
+                      rocketName={rocketNames?.[launch.rocket]}
+                      onClick={() => navigate(`/launches/${launch.id}`)}
+                    />
+                  ))
+                )}
+              </Stack>
+            ) : (
+              // Desktop Table View
+              <Paper
+                radius="md"
+                sx={{
+                  backgroundColor: SPACEX_COLORS.surface,
+                  border: `1px solid ${SPACEX_COLORS.border}`,
+                }}
               >
                 <Table>
                   <thead
@@ -706,11 +712,11 @@ export default function LaunchListPage() {
                     )}
                   </tbody>
                 </Table>
-              </ScrollArea>
-            </Paper>
-          )}
-        </Box>
-      </Container>
+              </Paper>
+            )}
+          </Box>
+        </Container>
+      </ScrollArea>
 
       {/* Mobile Navigation */}
       {isMobile && (
