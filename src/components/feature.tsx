@@ -9,8 +9,6 @@ import {
   Code,
   Box,
   Stack,
-  PaperProps,
-  CardProps
 } from "@mantine/core";
 
 interface ApiExampleCardProps {

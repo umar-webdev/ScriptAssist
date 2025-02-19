@@ -48,7 +48,6 @@ const SPACEX_COLORS = {
   border: 'rgba(255, 255, 255, 0.1)'
 } as const;
 
-// Types and Interfaces
 interface Launch {
   id: string;
   flight_number: number;
@@ -426,7 +425,6 @@ const FiltersPopover: React.FC<FiltersPopoverProps> = ({
   </Stack>
 );
 
-// Main Component
 const LaunchListPage: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -669,7 +667,6 @@ const LaunchListPage: React.FC = () => {
             />
             
             {isMobile ? (
-              // Mobile Card View
               <Stack spacing="md">
                 {isLoading ? (
                   [...Array(3)].map((_, i) => (

@@ -1,4 +1,3 @@
-// components/index.js
 export { LoginModal, RegisterModal } from "./modal";
 export { Navbar } from "./navbar";
 export { ApiExampleCard, FeatureCard, EndpointCategoryCard } from "./feature";

@@ -40,7 +40,6 @@ const SPACEX_COLORS = {
 
 interface User {
   apiKey: string;
-  // Add other user properties as needed
 }
 
 interface EndpointExampleProps {

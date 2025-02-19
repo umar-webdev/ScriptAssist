@@ -6,9 +6,7 @@ import {
   Header,
   Group,
   Button,
-  Title,
   Burger,
-  Drawer,
   Stack,
   Container,
   Text,
@@ -140,7 +138,13 @@ const ProtectedLayout: React.FC = () => {
     { icon: IconRocket, label: "Launches", to: "/Launchlist" },
     { icon: IconApiApp, label: "API Access", to: "/api" },
   ];
-
+  const handleNavClick = (to: string) => {
+    setActivePage(to);
+    navigate(to);
+    if (opened) { 
+      toggle();
+    }
+  };
   return (
     <AppShell
       padding={0}
@@ -179,10 +183,9 @@ const ProtectedLayout: React.FC = () => {
                   key={link.label}
                   {...link}
                   active={activePage === link.to}
-                  onClick={() => {
-                    setActivePage(link.to);
-                    navigate(link.to);
-                  }}
+                  onClick={() => handleNavClick(link.to)}
+
+                  
                 />
               ))}
             </Stack>

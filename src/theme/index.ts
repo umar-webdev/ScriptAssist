@@ -7,10 +7,9 @@ export const theme: MantineThemeOverride = {
   primaryColor: "spaceNeutral",
   defaultRadius: "md",
 
-  // Monochrome color palette
   colors: {
     spaceNeutral: [
-      "#FFFFFF", // Pure white
+      "#FFFFFF", 
       "#F5F5F5",
       "#E5E5E5",
       "#D4D4D4",

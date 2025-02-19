@@ -12,11 +12,6 @@ interface NavbarProps {
   onLoginClick: () => void;
   onRegisterClick: () => void;
 }
-
-interface MenuItem {
-  label: string;
-  href: string;
-}
 export const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -24,7 +19,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick })
     { label: "OVERVIEW", href: "#home" },
     { label: "FEATURES", href: "#features" },
     { label: "ENDPOINTS", href: "#endpoints" },
-    // { label: "EXAMPLES", href: "#examples" },
   ];
 
   return (
@@ -142,7 +136,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick })
           />
         </Group>
 
-        {/* Mobile Navigation Menu */}
         <Box
           sx={{
             display: isMobileMenuOpen ? "block" : "none",

@@ -11,8 +11,6 @@ import {
   TextInput,
   Stack,
   PasswordInput,
-  MantineNumberSize,
-  ModalProps,
 } from "@mantine/core";
 import { IconRocket } from "@tabler/icons-react";
 
@@ -101,10 +99,13 @@ interface User {
   apiKey?: string;
 }
 
-export const LoginModal: React.FC<ModalComponentProps> = ({ opened, onClose }) => {
-  const [formData, setFormData] = useState<LoginFormData>({ 
-    username: "", 
-    password: "" 
+export const LoginModal: React.FC<ModalComponentProps> = ({
+  opened,
+  onClose,
+}) => {
+  const [formData, setFormData] = useState<LoginFormData>({
+    username: "",
+    password: "",
   });
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
@@ -115,11 +116,11 @@ export const LoginModal: React.FC<ModalComponentProps> = ({ opened, onClose }) =
 
     const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
     // Check for demo account first
-    if (formData.username === 'demo' && formData.password === 'spacex2024') {
+    if (formData.username === "demo" && formData.password === "spacex2024") {
       const demoUser: User = {
-        username: 'demo',
-        password: 'spacex2024',
-        apiKey: 'sx-demo-' + Math.random().toString(36).substring(2, 15)
+        username: "demo",
+        password: "spacex2024",
+        apiKey: "sx-demo-" + Math.random().toString(36).substring(2, 15),
       };
       localStorage.setItem("currentUser", JSON.stringify(demoUser));
       onClose();
@@ -129,7 +130,8 @@ export const LoginModal: React.FC<ModalComponentProps> = ({ opened, onClose }) =
 
     // Check for registered users
     const user = users.find(
-      (u) => u.username === formData.username && u.password === formData.password
+      (u) =>
+        u.username === formData.username && u.password === formData.password
     );
 
     if (user) {
@@ -237,7 +239,7 @@ export const LoginModal: React.FC<ModalComponentProps> = ({ opened, onClose }) =
                 fontSize: "12px",
               }}
             >
-              Try demo account: username: demo password: spacex2024
+              Try demo account:- username: demo, password: spacex2024
             </Code>
           </Stack>
         </form>
@@ -246,7 +248,10 @@ export const LoginModal: React.FC<ModalComponentProps> = ({ opened, onClose }) =
   );
 };
 
-export const RegisterModal: React.FC<ModalComponentProps> = ({ opened, onClose }) => {
+export const RegisterModal: React.FC<ModalComponentProps> = ({
+  opened,
+  onClose,
+}) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     username: "",
     email: "",

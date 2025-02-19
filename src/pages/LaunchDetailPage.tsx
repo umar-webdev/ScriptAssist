@@ -34,7 +34,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
-// Type definitions
 interface Launch {
   id: string;
   name: string;
@@ -90,7 +89,6 @@ const LaunchDetailPage: React.FC = () => {
     setMounted(true);
   }, []);
 
-  // Fetch launch details
   const { data: launch, isLoading: isLoadingLaunch } = useQuery<Launch>({
     queryKey: ["launch", id],
     queryFn: async () => {
