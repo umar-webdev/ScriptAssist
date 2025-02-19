@@ -21,7 +21,6 @@ import {
   ScrollArea,
   Transition,
   Menu,
-  MantineNumberSize,
 } from '@mantine/core';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import { 
@@ -71,12 +70,14 @@ interface RocketNames {
 interface LaunchCardProps {
   launch: Launch;
   rocketName?: string;
+  isLoadingRocket: boolean;
   onClick: () => void;
 }
 
 interface TableRowProps {
   launch: Launch;
   rocketName?: string;
+  isLoadingRocket: boolean;
   onClick: () => void;
 }
 
@@ -91,8 +92,24 @@ interface FiltersPopoverProps {
   hasFilters: boolean;
 }
 
+// RocketBadge Component
+const RocketBadge = ({ rocketName, isLoading }: { rocketName?: string; isLoading: boolean }) => (
+  <Badge
+    variant="dot"
+    radius="sm"
+    leftSection={<Rocket size={14} />}
+    sx={{
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      color: 'white',
+      textTransform: 'none',
+    }}
+  >
+    {isLoading ? 'Loading...' : rocketName || 'Unknown Rocket'}
+  </Badge>
+);
+
 // LaunchCard Component for Mobile View
-const LaunchCard: React.FC<LaunchCardProps> = ({ launch, rocketName, onClick }) => {
+const LaunchCard: React.FC<LaunchCardProps> = ({ launch, rocketName, isLoadingRocket, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -196,18 +213,7 @@ const LaunchCard: React.FC<LaunchCardProps> = ({ launch, rocketName, onClick }) 
               {launch.crew?.length ? `${launch.crew.length} Crew` : 'No Crew'}
             </Badge>
 
-            <Badge
-              variant="dot"
-              radius="sm"
-              leftSection={<Rocket size={14} />}
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                color: 'white',
-                textTransform: 'none',
-              }}
-            >
-              {rocketName || 'Loading...'}
-            </Badge>
+            <RocketBadge rocketName={rocketName} isLoading={isLoadingRocket} />
           </Group>
         </Stack>
       </Stack>
@@ -216,7 +222,7 @@ const LaunchCard: React.FC<LaunchCardProps> = ({ launch, rocketName, onClick }) 
 };
 
 // Table Row Component
-const TableRow: React.FC<TableRowProps> = ({ launch, rocketName, onClick }) => (
+const TableRow: React.FC<TableRowProps> = ({ launch, rocketName, isLoadingRocket, onClick }) => (
   <tr 
     onClick={onClick}
     style={{ cursor: 'pointer' }}
@@ -296,17 +302,7 @@ const TableRow: React.FC<TableRowProps> = ({ launch, rocketName, onClick }) => (
     <td>
       <Group spacing="xs" noWrap>
         <Rocket size={16} color={SPACEX_COLORS.accent} />
-        <Badge
-          variant="dot"
-          radius="sm"
-          sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            color: 'white',
-            textTransform: 'none',
-          }}
-        >
-          {rocketName || 'Loading...'}
-        </Badge>
+        <RocketBadge rocketName={rocketName} isLoading={isLoadingRocket} />
       </Group>
     </td>
     <td>
@@ -325,7 +321,7 @@ const TableRow: React.FC<TableRowProps> = ({ launch, rocketName, onClick }) => (
   </tr>
 );
 
-// Filters Component
+// FiltersPopover Component (unchanged)
 const FiltersPopover: React.FC<FiltersPopoverProps> = ({ 
   selectedYear,
   setSelectedYear,
@@ -435,7 +431,7 @@ const LaunchListPage: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Data fetching
+  // Data fetching with improved error handling
   const { data: launches, isLoading: launchesLoading } = useQuery<Launch[]>({
     queryKey: ['launches'],
     queryFn: async () => {
@@ -448,13 +444,14 @@ const LaunchListPage: React.FC = () => {
   const { data: rockets, isLoading: rocketsLoading } = useQuery<Rocket[]>({
     queryKey: ['rockets'],
     queryFn: async () => {
-      const response = await fetch('https://api.spacexdata.com/v5/rockets');
+      const response = await fetch('https://api.spacexdata.com/v4/rockets');  // Changed to v4 endpoint
       if (!response.ok) throw new Error('Failed to fetch rockets');
       return response.json();
-    }
+    },
+    staleTime: 1000 * 60 * 5 // Cache for 5 minutes
   });
 
-  const isLoading = launchesLoading || rocketsLoading;
+  const isLoading = launchesLoading;
   const hasActiveFilters = selectedYear || selectedStatus || selectedCrew;
 
   // Process data
@@ -475,9 +472,9 @@ const LaunchListPage: React.FC = () => {
       (selectedStatus === 'failed' && launch.success === false) ||
       (selectedStatus === 'unknown' && launch.success === null);
 
-      const matchesCrew = !selectedCrew ||
+    const matchesCrew = !selectedCrew ||
       (selectedCrew === 'crew' && launch.crew && launch.crew.length > 0) ||
-      (selectedCrew === 'no-crew' && (!launch.crew || (launch.crew && launch.crew.length === 0)));
+      (selectedCrew === 'no-crew' && (!launch.crew || launch.crew.length === 0));
 
     return matchesSearch && matchesYear && matchesStatus && matchesCrew;
   });
@@ -691,7 +688,8 @@ const LaunchListPage: React.FC = () => {
                     <LaunchCard
                       key={launch.id}
                       launch={launch}
-                      rocketName={rocketNames?.[launch.rocket]}
+                      rocketName={rocketNames[launch.rocket]}
+                      isLoadingRocket={rocketsLoading}
                       onClick={() => navigate(`/launches/${launch.id}`)}
                     />
                   ))
@@ -747,7 +745,8 @@ const LaunchListPage: React.FC = () => {
                         <TableRow
                           key={launch.id}
                           launch={launch}
-                          rocketName={rocketNames?.[launch.rocket]}
+                          rocketName={rocketNames[launch.rocket]}
+                          isLoadingRocket={rocketsLoading}
                           onClick={() => navigate(`/launches/${launch.id}`)}
                         />
                       ))
