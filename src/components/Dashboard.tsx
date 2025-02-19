@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Grid,
@@ -25,7 +24,8 @@ import {
   Activity,
   CheckCircle2,
   XCircle,
-  Clock
+  Clock,
+  LucideIcon
 } from 'lucide-react';
 
 const SPACEX_COLORS = {
@@ -37,9 +37,51 @@ const SPACEX_COLORS = {
   error: '#DC3545',
   warning: '#FFC107',
   border: 'rgba(255, 255, 255, 0.1)'
-};
+} as const;
 
-const MetricCard = ({ title, value, icon: Icon, color, loading, secondaryValue }) => (
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  color?: string;
+  loading?: boolean;
+  secondaryValue?: number;
+}
+
+interface StatusCardProps {
+  success: number;
+  failed: number;
+  pending: number;
+  loading?: boolean;
+}
+
+interface Launch {
+  success: boolean | null;
+  date_utc: string;
+  crew?: Array<any>;
+}
+
+interface Metrics {
+  successful: number;
+  failed: number;
+  pending: number;
+  crewMissions: number;
+  monthlyLaunches: Record<string, number>;
+}
+
+interface ChartDataPoint {
+  month: string;
+  launches: number;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({ 
+  title, 
+  value, 
+  icon: Icon, 
+  color, 
+  loading, 
+  secondaryValue 
+}) => (
   <Paper
     p="md"
     radius="md"
@@ -82,7 +124,7 @@ const MetricCard = ({ title, value, icon: Icon, color, loading, secondaryValue }
   </Paper>
 );
 
-const StatusCard = ({ success, failed, pending, loading }) => {
+const StatusCard: React.FC<StatusCardProps> = ({ success, failed, pending, loading }) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   return (
@@ -143,11 +185,10 @@ const StatusCard = ({ success, failed, pending, loading }) => {
   );
 };
 
-export default function DashboardPage() {
+const DashboardPage: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Query and data fetching
-  const { data: launches, isLoading: launchesLoading } = useQuery({
+  const { data: launches, isLoading: launchesLoading } = useQuery<Launch[]>({
     queryKey: ['launches'],
     queryFn: async () => {
       const response = await fetch('https://api.spacexdata.com/v5/launches');
@@ -155,15 +196,16 @@ export default function DashboardPage() {
     }
   });
 
-  // Calculate metrics
-  const metrics = launches?.reduce((acc, launch) => {
+  // Calculate metrics with proper typing
+  const metrics: Metrics = launches?.reduce((acc: Metrics, launch: Launch) => {
     // Update success/failure counts
     if (launch.success === true) acc.successful++;
     else if (launch.success === false) acc.failed++;
     else acc.pending++;
 
     // Count crew missions
-    if (launch.crew?.length > 0) acc.crewMissions++;
+    if (launch.crew && launch.crew.length > 0) acc.crewMissions++;
+
 
     // Track monthly launches
     const month = new Date(launch.date_utc).toISOString().slice(0, 7);
@@ -176,13 +218,19 @@ export default function DashboardPage() {
     pending: 0,
     crewMissions: 0,
     monthlyLaunches: {}
-  }) || {};
+  }) || {
+    successful: 0,
+    failed: 0,
+    pending: 0,
+    crewMissions: 0,
+    monthlyLaunches: {}
+  };
 
-  // Prepare chart data
-  const chartData = Object.entries(metrics.monthlyLaunches || {})
+
+  const chartData: ChartDataPoint[] = Object.entries(metrics.monthlyLaunches || {})
     .slice(-12)
     .map(([month, count]) => ({
-      month: month.slice(5), // Show only MM-YYYY
+      month: month.slice(5), 
       launches: count
     }));
 
@@ -334,4 +382,6 @@ export default function DashboardPage() {
       </Box>
     </ScrollArea>
   );
-}
+};
+
+export default DashboardPage;

@@ -33,62 +33,113 @@ import {
   Gauge,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Launch, Rocket as RocketType, Launchpad } from "../types/launch";
 
-export default function LaunchDetailPage() {
-  const { id } = useParams();
+// Type definitions
+interface Launch {
+  id: string;
+  name: string;
+  details: string | null;
+  success: boolean | null;
+  upcoming: boolean;
+  date_utc: string;
+  rocket: string;
+  launchpad: string;
+  crew: Array<any>;
+  links?: {
+    patch?: {
+      small: string;
+      large: string;
+    };
+  };
+}
+
+interface RocketType {
+  id: string;
+  name: string;
+  description: string;
+  success_rate_pct: number;
+}
+
+interface Launchpad {
+  id: string;
+  name: string;
+  locality: string;
+  region: string;
+  status: string;
+  details: string;
+}
+
+interface TimelineItem {
+  bullet: React.ReactNode;
+  title: string;
+  description: string;
+  time: string;
+}
+
+interface BreadcrumbItem {
+  title: string;
+  href: string;
+}
+
+const LaunchDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // Fetch launch details
-  const { data: launch, isLoading: isLoadingLaunch } = useQuery({
+  const { data: launch, isLoading: isLoadingLaunch } = useQuery<Launch>({
     queryKey: ["launch", id],
     queryFn: async () => {
       const response = await fetch(
         `https://api.spacexdata.com/v4/launches/${id}`
       );
-      return response.json() as Promise<Launch>;
+      if (!response.ok) throw new Error('Failed to fetch launch');
+      return response.json();
     },
   });
 
   // Enrich with rocket details
-  const { data: rocket, isLoading: isLoadingRocket } = useQuery({
+  const { data: rocket, isLoading: isLoadingRocket } = useQuery<RocketType>({
     queryKey: ["rocket", launch?.rocket],
     enabled: !!launch?.rocket,
     queryFn: async () => {
       const response = await fetch(
-        `https://api.spacexdata.com/v4/rockets/${launch.rocket}`
+        `https://api.spacexdata.com/v4/rockets/${launch?.rocket}`
       );
-      return response.json() as Promise<RocketType>;
+      if (!response.ok) throw new Error('Failed to fetch rocket');
+      return response.json();
     },
   });
 
   // Fetch launchpad details
-  const { data: launchpad, isLoading: isLoadingLaunchpad } = useQuery({
+  const { data: launchpad, isLoading: isLoadingLaunchpad } = useQuery<Launchpad>({
     queryKey: ["launchpad", launch?.launchpad],
     enabled: !!launch?.launchpad,
     queryFn: async () => {
       const response = await fetch(
-        `https://api.spacexdata.com/v4/launchpads/${launch.launchpad}`
+        `https://api.spacexdata.com/v4/launchpads/${launch?.launchpad}`
       );
-      return response.json() as Promise<Launchpad>;
+      if (!response.ok) throw new Error('Failed to fetch launchpad');
+      return response.json();
     },
   });
 
   const isLoading = isLoadingLaunch || isLoadingRocket || isLoadingLaunchpad;
 
-  const items = [
+  const breadcrumbItems: BreadcrumbItem[] = [
     { title: "Launches", href: "/launchlist" },
     { title: launch?.name || "Loading...", href: "#" },
-  ].map((item, index) => (
+  ];
+
+  const items = breadcrumbItems.map((item, index) => (
     <Anchor
       key={index}
       href={item.href}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         if (item.href !== "#") navigate(item.href);
       }}
@@ -97,7 +148,7 @@ export default function LaunchDetailPage() {
     </Anchor>
   ));
 
-  const LoadingSection = () => (
+  const LoadingSection: React.FC = () => (
     <Box py="xl">
       <Stack spacing="md">
         <Skeleton height={50} radius="md" />
@@ -412,4 +463,6 @@ export default function LaunchDetailPage() {
       </Container>
     </Box>
   );
-}
+};
+
+export default LaunchDetailPage;

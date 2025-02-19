@@ -21,6 +21,7 @@ import {
   ScrollArea,
   Transition,
   Menu,
+  MantineNumberSize,
 } from '@mantine/core';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import { 
@@ -45,10 +46,54 @@ const SPACEX_COLORS = {
   error: '#DC3545',
   warning: '#FFC107',
   border: 'rgba(255, 255, 255, 0.1)'
-};
+} as const;
+
+// Types and Interfaces
+interface Launch {
+  id: string;
+  flight_number: number;
+  name: string;
+  date_utc: string;
+  success: boolean | null;
+  upcoming: boolean;
+  crew?: Array<any>;
+  rocket: string;
+}
+
+interface Rocket {
+  id: string;
+  name: string;
+}
+
+interface RocketNames {
+  [key: string]: string;
+}
+
+interface LaunchCardProps {
+  launch: Launch;
+  rocketName?: string;
+  onClick: () => void;
+}
+
+interface TableRowProps {
+  launch: Launch;
+  rocketName?: string;
+  onClick: () => void;
+}
+
+interface FiltersPopoverProps {
+  selectedYear: string;
+  setSelectedYear: (value: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (value: string) => void;
+  selectedCrew: string;
+  setSelectedCrew: (value: string) => void;
+  onReset: () => void;
+  hasFilters: boolean;
+}
 
 // LaunchCard Component for Mobile View
-const LaunchCard = ({ launch, rocketName, onClick }) => {
+const LaunchCard: React.FC<LaunchCardProps> = ({ launch, rocketName, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -58,7 +103,7 @@ const LaunchCard = ({ launch, rocketName, onClick }) => {
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      sx={(theme) => ({
+      sx={{
         backgroundColor: SPACEX_COLORS.surface,
         border: `1px solid ${SPACEX_COLORS.border}`,
         cursor: 'pointer',
@@ -69,7 +114,7 @@ const LaunchCard = ({ launch, rocketName, onClick }) => {
           transform: 'translateY(-2px)',
           borderColor: SPACEX_COLORS.primary,
         }
-      })}
+      }}
     >
       <Stack spacing="md">
         <Group position="apart" align="flex-start">
@@ -172,7 +217,7 @@ const LaunchCard = ({ launch, rocketName, onClick }) => {
 };
 
 // Table Row Component
-const TableRow = ({ launch, rocketName, onClick }) => (
+const TableRow: React.FC<TableRowProps> = ({ launch, rocketName, onClick }) => (
   <tr 
     onClick={onClick}
     style={{ cursor: 'pointer' }}
@@ -282,7 +327,7 @@ const TableRow = ({ launch, rocketName, onClick }) => (
 );
 
 // Filters Component
-const FiltersPopover = ({ 
+const FiltersPopover: React.FC<FiltersPopoverProps> = ({ 
   selectedYear,
   setSelectedYear,
   selectedStatus,
@@ -369,9 +414,9 @@ const FiltersPopover = ({
         leftIcon={<FilterX size={16} />}
         onClick={onReset}
         sx={{
-          color: 'white',
+          color: 'black',
           '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            backgroundColor: 'rgba(255, 255, 255, 0.64)',
           }
         }}
       >
@@ -382,7 +427,7 @@ const FiltersPopover = ({
 );
 
 // Main Component
-export default function LaunchListPage() {
+const LaunchListPage: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filterOpened, { toggle: toggleFilter, close: closeFilter }] = useDisclosure(false);
@@ -393,7 +438,7 @@ export default function LaunchListPage() {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Data fetching
-  const { data: launches, isLoading: launchesLoading } = useQuery({
+  const { data: launches, isLoading: launchesLoading } = useQuery<Launch[]>({
     queryKey: ['launches'],
     queryFn: async () => {
       const response = await fetch('https://api.spacexdata.com/v5/launches');
@@ -402,7 +447,7 @@ export default function LaunchListPage() {
     }
   });
 
-  const { data: rockets, isLoading: rocketsLoading } = useQuery({
+  const { data: rockets, isLoading: rocketsLoading } = useQuery<Rocket[]>({
     queryKey: ['rockets'],
     queryFn: async () => {
       const response = await fetch('https://api.spacexdata.com/v5/rockets');
@@ -415,10 +460,10 @@ export default function LaunchListPage() {
   const hasActiveFilters = selectedYear || selectedStatus || selectedCrew;
 
   // Process data
-  const rocketNames = rockets?.reduce((acc, rocket) => {
+  const rocketNames: RocketNames = rockets?.reduce((acc: RocketNames, rocket) => {
     acc[rocket.id] = rocket.name;
     return acc;
-  }, {});
+  }, {}) || {};
 
   const filteredLaunches = launches?.filter(launch => {
     const matchesSearch = search === '' || 
@@ -432,9 +477,9 @@ export default function LaunchListPage() {
       (selectedStatus === 'failed' && launch.success === false) ||
       (selectedStatus === 'unknown' && launch.success === null);
 
-    const matchesCrew = !selectedCrew ||
-      (selectedCrew === 'crew' && launch.crew?.length > 0) ||
-      (selectedCrew === 'no-crew' && (!launch.crew || launch.crew.length === 0));
+      const matchesCrew = !selectedCrew ||
+      (selectedCrew === 'crew' && launch.crew && launch.crew.length > 0) ||
+      (selectedCrew === 'no-crew' && (!launch.crew || (launch.crew && launch.crew.length === 0)));
 
     return matchesSearch && matchesYear && matchesStatus && matchesCrew;
   });
@@ -588,7 +633,7 @@ export default function LaunchListPage() {
                     selectedCrew={selectedCrew}
                     setSelectedCrew={setSelectedCrew}
                     onReset={resetFilters}
-                    hasFilters={hasActiveFilters}
+                    hasFilters={!!hasActiveFilters}
                   />
                 </Popover.Dropdown>
               </Popover>
@@ -766,7 +811,7 @@ export default function LaunchListPage() {
                     selectedCrew={selectedCrew}
                     setSelectedCrew={setSelectedCrew}
                     onReset={resetFilters}
-                    hasFilters={hasActiveFilters}
+                    hasFilters={!!hasActiveFilters}
                   />
                 </Menu.Dropdown>
               </Menu>
@@ -776,4 +821,6 @@ export default function LaunchListPage() {
       )}
     </Box>
   );
-}
+};
+
+export default LaunchListPage;

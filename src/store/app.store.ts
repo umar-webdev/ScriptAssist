@@ -1,5 +1,9 @@
 import { create } from 'zustand';
-import { LaunchFilters } from '../types/launch';
+
+interface LaunchFilters {
+  success: boolean | null;
+  withCrew: boolean | null;
+}
 
 interface AppState {
   selectedYear: string;
@@ -10,10 +14,12 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   selectedYear: '',
-  setSelectedYear: (year) => set({ selectedYear: year }),
+  setSelectedYear: (year: string) => set({ selectedYear: year }),
+  
   selectedLaunchFilters: {
     success: null,
     withCrew: null,
   },
-  setSelectedLaunchFilters: (filters) => set({ selectedLaunchFilters: filters }),
+  setSelectedLaunchFilters: (filters: LaunchFilters) => 
+    set({ selectedLaunchFilters: filters }),
 }));

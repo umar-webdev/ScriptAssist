@@ -14,7 +14,6 @@ import {
   Badge,
   Accordion,
   Alert,
-  TextInput,
 } from '@mantine/core';
 import { 
   Key, 
@@ -25,7 +24,6 @@ import {
   AlertCircle,
   Terminal,
   Database,
-  Rocket,
   Lock
 } from 'lucide-react';
 
@@ -38,9 +36,26 @@ const SPACEX_COLORS = {
   error: '#DC3545',
   warning: '#FFC107',
   border: 'rgba(255, 255, 255, 0.1)'
-};
+} as const;
 
-const EndpointExample = ({ method, endpoint, description, responseExample }) => (
+interface User {
+  apiKey: string;
+  // Add other user properties as needed
+}
+
+interface EndpointExampleProps {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  endpoint: string;
+  description: string;
+  responseExample: string;
+}
+
+const EndpointExample: React.FC<EndpointExampleProps> = ({ 
+  method, 
+  endpoint, 
+  description, 
+  responseExample 
+}) => (
   <Accordion.Item value={endpoint}>
     <Accordion.Control>
       <Group position="apart">
@@ -94,9 +109,14 @@ const EndpointExample = ({ method, endpoint, description, responseExample }) => 
   </Accordion.Item>
 );
 
-export default function ApiAccessPage() {
-  const [currentUser] = useState(JSON.parse(localStorage.getItem('currentUser')));
-  const [activeTab, setActiveTab] = useState('documentation');
+type TabValue = 'documentation' | 'examples' | 'authentication';
+
+const ApiAccessPage: React.FC = () => {
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [activeTab, setActiveTab] = useState<TabValue>('documentation');
 
   return (
     <Box p="xl">
@@ -153,19 +173,19 @@ export default function ApiAccessPage() {
                   {currentUser?.apiKey || 'sx-' + Math.random().toString(36).substring(2, 15)}
                 </Code>
                 <CopyButton value={currentUser?.apiKey || ''} timeout={2000}>
-                {({ copied, copy }) => (
+                  {({ copied, copy }) => (
                     <Button
-                      color={copied ? 'green' : 'blue'}
+                      color={copied ? 'green' : 'white'}
                       onClick={copy}
                       leftIcon={copied ? <Check size={16} /> : <Copy size={16} />}
                       sx={{
                         backgroundColor: copied ? 
-                          'rgba(39, 167, 105, 0.15)' : 
-                          'rgba(0, 82, 136, 0.15)',
+                          'rgba(225, 250, 238, 0.73)' : 
+                          'rgb(255, 255, 255)',
                         '&:hover': {
                           backgroundColor: copied ?
-                            'rgba(39, 167, 105, 0.25)' :
-                            'rgba(0, 82, 136, 0.25)',
+                            'rgba(255, 255, 255, 0.25)' :
+                            'rgba(255, 255, 255, 0.25)',
                         }
                       }}
                     >
@@ -194,7 +214,7 @@ export default function ApiAccessPage() {
           {/* Documentation Tabs */}
           <Tabs 
             value={activeTab} 
-            onTabChange={setActiveTab}
+            onTabChange={(value) => setActiveTab(value as TabValue)}
             sx={{
               '.mantine-Tabs-tab': {
                 color: SPACEX_COLORS.accent,
@@ -517,4 +537,6 @@ launches = response.json()`}
       </Container>
     </Box>
   );
-}
+};
+
+export default ApiAccessPage;
